@@ -14,12 +14,12 @@ type ContainerContract interface {
 	Stop() error
 }
 
-type dockerContainer struct {
+type container struct {
 	ContainerID string
 	Image       provider.ImageProvider
 }
 
-func (dc *dockerContainer) Start() error {
+func (dc *container) Start() error {
 	hasImage, err := dc.Image.Has()
 	if err != nil {
 		return err
@@ -53,14 +53,19 @@ func (dc *dockerContainer) Start() error {
 	return nil
 }
 
-func (dc *dockerContainer) Stop() error {
+func (dc *container) Stop() error {
 	return dc.Image.Stop()
+}
+
+// NewDefaultContainer returns new instance of default container
+func NewDefaultContainer(imageProvider provider.ImageProvider, containerID string) ContainerContract {
+	return &container{Image: imageProvider, ContainerID: containerID}
 }
 
 // NewDockerContainer returns new instance of dockerContainer
 func NewDockerContainer(ctx context.Context, dockerClient *client.Client, imageName string, host string, containerPort string, exposedPort string, containerName string, envConfig []string) ContainerContract {
 	imageProvider := docker.NewDockerImageProvider(ctx, dockerClient, imageName, host, containerPort, exposedPort, containerName, envConfig)
-	return &dockerContainer{
+	return &container{
 		Image:       imageProvider,
 		ContainerID: ``,
 	}

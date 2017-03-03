@@ -1,34 +1,95 @@
 package envase_test
 
 import (
-	"context"
+	"errors"
 	"testing"
 
 	"github.com/arielizuardi/envase"
-	"github.com/docker/docker/client"
+	"github.com/arielizuardi/envase/provider/mocks"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestStartMySQL(t *testing.T) {
-	ctx := context.Background()
-	dockerClient, err := client.NewEnvClient()
-	assert.NoError(t, err)
-	envConfig := []string{
-		"MYSQL_USER=" + `user`,
-		"MYSQL_ROOT_PASSWORD=" + `pass`,
-		"MYSQL_DATABASE=" + `kurio_db`,
-	}
-	container := envase.NewDockerContainer(ctx, dockerClient, `mysql:5.7`, `127.0.0.1`, `3306`, `33060`, `papua_test`, envConfig)
+func TestStartWithNoImageInstalled(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Has`).Return(false, nil)
+	provider.On(`Pull`).Return(nil)
+	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Create`).Return(`container-id`, nil)
+	provider.On(`Start`).Return(nil)
 
+	container := envase.NewDefaultContainer(provider, ``)
 	assert.NoError(t, container.Start())
+
+	provider.AssertCalled(t, `Has`)
+	provider.AssertCalled(t, `Pull`)
+	provider.AssertCalled(t, `Status`)
+	provider.AssertCalled(t, `Create`)
+	provider.AssertCalled(t, `Start`)
 }
 
-func TestStartFluentd(t *testing.T) {
-	ctx := context.Background()
-	dockerClient, err := client.NewEnvClient()
-	assert.NoError(t, err)
-	envConfig := []string{}
-	container := envase.NewDockerContainer(ctx, dockerClient, `fluent/fluentd:v0.12.32`, `127.0.0.1`, `24224`, `24224`, `charon_test`, envConfig)
+func TestStartWithImageAlreadyInSystemAndStartTheImage(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Has`).Return(true, nil)
+	provider.On(`Status`).Return(true, false, nil)
+	provider.On(`Start`).Return(nil)
 
+	container := envase.NewDefaultContainer(provider, ``)
 	assert.NoError(t, container.Start())
+
+	provider.AssertCalled(t, `Has`)
+	provider.AssertNotCalled(t, `Pull`)
+	provider.AssertCalled(t, `Status`)
+	provider.AssertNotCalled(t, `Create`)
+	provider.AssertCalled(t, `Start`)
+}
+
+func TestStartWithImageAlreadyInSystemAndAlreadyRunning(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Has`).Return(true, nil)
+	provider.On(`Status`).Return(true, true, nil)
+
+	container := envase.NewDefaultContainer(provider, ``)
+	assert.NoError(t, container.Start())
+
+	provider.AssertCalled(t, `Has`)
+	provider.AssertNotCalled(t, `Pull`)
+	provider.AssertCalled(t, `Status`)
+	provider.AssertNotCalled(t, `Create`)
+	provider.AssertNotCalled(t, `Start`)
+}
+
+func TestStartWithNoImageInstalledAndFailedToPull(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Has`).Return(false, nil)
+	provider.On(`Pull`).Return(errors.New(`Whoops!`))
+	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Create`).Return(`container-id`, nil)
+	provider.On(`Start`).Return(nil)
+
+	container := envase.NewDefaultContainer(provider, ``)
+	assert.Error(t, container.Start())
+
+	provider.AssertCalled(t, `Has`)
+	provider.AssertCalled(t, `Pull`)
+	provider.AssertNotCalled(t, `Status`)
+	provider.AssertNotCalled(t, `Create`)
+	provider.AssertNotCalled(t, `Start`)
+}
+
+func TestStartWithNoImageInstalledAndFailedToCreate(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Has`).Return(false, nil)
+	provider.On(`Pull`).Return(nil)
+	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Create`).Return(``, errors.New(`Whoops!`))
+	provider.On(`Start`).Return(nil)
+
+	container := envase.NewDefaultContainer(provider, ``)
+	assert.Error(t, container.Start())
+
+	provider.AssertCalled(t, `Has`)
+	provider.AssertCalled(t, `Pull`)
+	provider.AssertCalled(t, `Status`)
+	provider.AssertCalled(t, `Create`)
+	provider.AssertNotCalled(t, `Start`)
 }
