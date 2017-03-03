@@ -28,8 +28,16 @@ if err != nil {
     panic(err)
 }
 
+fluentdImage := `fluent/fluentd:v0.12.32`
+fluentHost := `127.0.0.1`
+containerPort := `24224`
+exposedPort := `24224`
+containerName := `fluent_test`
+
 envConfig := []string{}
-container := envase.NewDockerContainer(ctx, dockerClient, `fluent/fluentd:v0.12.32`, `127.0.0.1`, `24224`, `24224`, `fluent_test`, envConfig)
+
+envConfig := []string{}
+container := envase.NewDockerContainer(ctx, dockerClient, fluentdImage , fluentHost, containerPort, exposedPort, containerName, envConfig)
 
 err := container.Start()
 
@@ -52,9 +60,14 @@ envConfig := []string{
 	"MYSQL_ROOT_PASSWORD="your_password",
 	"MYSQL_DATABASE="your_database",
 }
+
+mysqlImage := `mysql:5.7`
+mysqlHost := `127.0.0.1`
+containerPort := `3306`
+exposedPort := `33060` 
+containerName := `mysql_test`
   
-  
-container := envase.NewDockerContainer(ctx, dockerClient, `mysql:5.7`, `127.0.0.1`, `3306`, `33060`, `mysql_test`, envConfig)
+container := envase.NewDockerContainer(ctx, dockerClient, mysqlImage, mysqlHost, containerPort, exposedPort, containerName, envConfig)
   
 if err != nil {
    panic(err)
