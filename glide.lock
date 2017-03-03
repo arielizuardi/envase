@@ -1,5 +1,5 @@
-hash: 8187988a86fbf6de7d74c29f9baea12b12cfc0b5a17fb6f580220d56464aa301
-updated: 2017-03-03T14:25:54.886481685+07:00
+hash: 49b4f111e36f9a459963917e93e2aa3b3b139208092d0c7a984b65e2d9fa3e09
+updated: 2017-03-03T15:50:16.146961053+07:00
 imports:
 - name: github.com/docker/distribution
   version: 7a0972304e201e2a5336a69d00e112c27823f554
@@ -56,4 +56,16 @@ imports:
   subpackages:
   - unix
   - windows
-testImports: []
+testImports:
+- name: github.com/davecgh/go-spew
+  version: 6d212800a42e8ab5c146b8ace3490ee17e5225f9
+  subpackages:
+  - spew
+- name: github.com/pmezard/go-difflib
+  version: d8ed2627bdf02c080bf22230dbb337003b7aba2d
+  subpackages:
+  - difflib
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - assert
