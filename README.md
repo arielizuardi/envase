@@ -22,41 +22,41 @@ If you are using glide
 ## Start `fluentd` Container
 
 ```
-  ctx := context.Background()
-	dockerClient, err := client.NewEnvClient()
-	if err != nil {
-     panic(err)
-  }
-   
-	envConfig := []string{}
-	container := envase.NewDockerContainer(ctx, dockerClient, `fluent/fluentd:v0.12.32`, `127.0.0.1`, `24224`, `24224`, `fluent_test`, envConfig)
-  
-  err := container.Start()
-  
-  if err != nil {
-     panic(err)
-  }
+ctx := context.Background()
+dockerClient, err := client.NewEnvClient()
+if err != nil {
+    panic(err)
+}
+
+envConfig := []string{}
+container := envase.NewDockerContainer(ctx, dockerClient, `fluent/fluentd:v0.12.32`, `127.0.0.1`, `24224`, `24224`, `fluent_test`, envConfig)
+
+err := container.Start()
+
+if err != nil {
+    panic(err)
+}
   
 ```
 
 ## Start `mysql` Container
 
 ```
-  dockerClient, err := client.NewEnvClient()
-	if err != nil {
-     panic(err)
-  }
+dockerClient, err := client.NewEnvClient()
+if err != nil {
+    panic(err)
+}
    
-	envConfig := []string{
-      		"MYSQL_USER="your_user",
-					"MYSQL_ROOT_PASSWORD="your_password",
-					"MYSQL_DATABASE="your_database",
-  }
+envConfig := []string{
+	"MYSQL_USER="your_user",
+	"MYSQL_ROOT_PASSWORD="your_password",
+	"MYSQL_DATABASE="your_database",
+}
   
   
-	container := envase.NewDockerContainer(ctx, dockerClient, `mysql:5.7`, `127.0.0.1`, `3306`, `33060`, `mysql_test`, envConfig)
+container := envase.NewDockerContainer(ctx, dockerClient, `mysql:5.7`, `127.0.0.1`, `3306`, `33060`, `mysql_test`, envConfig)
   
-  if err != nil {
-     panic(err)
-  }
+if err != nil {
+   panic(err)
+}
 ```
