@@ -60,3 +60,11 @@ if err != nil {
    panic(err)
 }
 ```
+
+### Stop Your Container
+```
+err := container.Stop()
+if err != nil {
+    panic(err)
+}
+```
