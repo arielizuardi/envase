@@ -93,3 +93,21 @@ func TestStartWithNoImageInstalledAndFailedToCreate(t *testing.T) {
 	provider.AssertCalled(t, `Create`)
 	provider.AssertNotCalled(t, `Start`)
 }
+
+func TestStop(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Stop`).Return(nil)
+
+	container := envase.NewDefaultContainer(provider, ``)
+	assert.NoError(t, container.Stop())
+	provider.AssertCalled(t, `Stop`)
+}
+
+func TestStopAndGotError(t *testing.T) {
+	provider := &mocks.ImageProvider{}
+	provider.On(`Stop`).Return(errors.New(`Whoops!`))
+
+	container := envase.NewDefaultContainer(provider, ``)
+	assert.Error(t, container.Stop())
+	provider.AssertCalled(t, `Stop`)
+}
