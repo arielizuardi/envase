@@ -9,13 +9,9 @@ For example: In MySQL if you want to make sure your query is working like expect
 
 Hopefully, this library will make testing easier.
 
-## Usage 
+## Installation 
 
 ```go get github.com/arielizuardi/envase```
-
-If you are using glide
-
-```glide get github.com/arielizuardi/envase```
 
 ## Example
 
