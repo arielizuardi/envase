@@ -63,13 +63,13 @@ func (i *dockerImageProvider) Pull() error {
 	return nil
 }
 
-func (i *dockerImageProvider) Status() (bool, bool, error) {
+func (i *dockerImageProvider) Status() (bool, bool, string, error) {
 	imageCreated := false
 	imageRunning := false
 
 	containers, err := i.DockerClient.ContainerList(i.Ctx, types.ContainerListOptions{All: true})
 	if err != nil {
-		return imageCreated, imageRunning, err
+		return imageCreated, imageRunning, i.ContainerID, err
 	}
 
 	for _, container := range containers {
@@ -79,10 +79,12 @@ func (i *dockerImageProvider) Status() (bool, bool, error) {
 			if container.State == `running` {
 				imageRunning = true
 			}
+
+			i.ContainerID = container.ID
 		}
 	}
 
-	return imageCreated, imageRunning, nil
+	return imageCreated, imageRunning, i.ContainerID, nil
 }
 
 func (i *dockerImageProvider) Create() (string, error) {
