@@ -5,7 +5,7 @@ type ImageProvider interface {
 	// Has returns bool flag indicates image already exists or not
 	Has() (bool, error)
 	// Status returns bool flag indicates image creation status, image running status
-	Status() (bool, bool, error)
+	Status() (bool, bool, string, error)
 	// Pull pulls image from the hub
 	Pull() error
 	// Create create image and returns identifier for image

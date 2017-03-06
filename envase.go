@@ -32,20 +32,21 @@ func (dc *container) Start() error {
 		}
 	}
 
-	imageCreated, imageRunning, err := dc.Image.Status()
+	imageCreated, imageRunning, containerID, err := dc.Image.Status()
 	if err != nil {
 		return err
 	}
 
 	if !imageCreated {
 		dc.ContainerID, err = dc.Image.Create()
+		containerID = dc.ContainerID
 		if err != nil {
 			return err
 		}
 	}
 
 	if !imageRunning {
-		if err := dc.Image.Start(dc.ContainerID); err != nil {
+		if err := dc.Image.Start(containerID); err != nil {
 			return err
 		}
 	}

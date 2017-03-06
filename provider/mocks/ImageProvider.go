@@ -78,7 +78,7 @@ func (_m *ImageProvider) Start(containerID string) error {
 }
 
 // Status provides a mock function with given fields:
-func (_m *ImageProvider) Status() (bool, bool, error) {
+func (_m *ImageProvider) Status() (bool, bool, string, error) {
 	ret := _m.Called()
 
 	var r0 bool
@@ -95,14 +95,21 @@ func (_m *ImageProvider) Status() (bool, bool, error) {
 		r1 = ret.Get(1).(bool)
 	}
 
-	var r2 error
-	if rf, ok := ret.Get(2).(func() error); ok {
+	var r2 string
+	if rf, ok := ret.Get(2).(func() string); ok {
 		r2 = rf()
 	} else {
-		r2 = ret.Error(2)
+		r2 = ret.Get(2).(string)
 	}
 
-	return r0, r1, r2
+	var r3 error
+	if rf, ok := ret.Get(3).(func() error); ok {
+		r3 = rf()
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
 }
 
 // Stop provides a mock function with given fields: containerID

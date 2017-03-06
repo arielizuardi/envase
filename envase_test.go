@@ -14,7 +14,7 @@ func TestStartWithNoImageInstalled(t *testing.T) {
 	provider := &mocks.ImageProvider{}
 	provider.On(`Has`).Return(false, nil)
 	provider.On(`Pull`).Return(nil)
-	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Status`).Return(false, false, `containerid`, nil)
 	provider.On(`Create`).Return(`container-id`, nil)
 	provider.On(`Start`, mock.AnythingOfType(`string`)).Return(nil)
 
@@ -31,7 +31,7 @@ func TestStartWithNoImageInstalled(t *testing.T) {
 func TestStartWithImageAlreadyInSystemAndStartTheImage(t *testing.T) {
 	provider := &mocks.ImageProvider{}
 	provider.On(`Has`).Return(true, nil)
-	provider.On(`Status`).Return(true, false, nil)
+	provider.On(`Status`).Return(true, false, `containerid`, nil)
 	provider.On(`Start`, mock.AnythingOfType(`string`)).Return(nil)
 
 	container := envase.NewDefaultContainer(provider, ``)
@@ -41,13 +41,13 @@ func TestStartWithImageAlreadyInSystemAndStartTheImage(t *testing.T) {
 	provider.AssertNotCalled(t, `Pull`)
 	provider.AssertCalled(t, `Status`)
 	provider.AssertNotCalled(t, `Create`)
-	provider.AssertCalled(t, `Start`, mock.AnythingOfType(`string`))
+	provider.AssertCalled(t, `Start`, `containerid`)
 }
 
 func TestStartWithImageAlreadyInSystemAndAlreadyRunning(t *testing.T) {
 	provider := &mocks.ImageProvider{}
 	provider.On(`Has`).Return(true, nil)
-	provider.On(`Status`).Return(true, true, nil)
+	provider.On(`Status`).Return(true, true, `containerid`, nil)
 
 	container := envase.NewDefaultContainer(provider, ``)
 	assert.NoError(t, container.Start())
@@ -56,14 +56,14 @@ func TestStartWithImageAlreadyInSystemAndAlreadyRunning(t *testing.T) {
 	provider.AssertNotCalled(t, `Pull`)
 	provider.AssertCalled(t, `Status`)
 	provider.AssertNotCalled(t, `Create`)
-	provider.AssertNotCalled(t, `Start`, mock.AnythingOfType(`string`))
+	provider.AssertNotCalled(t, `Start`, `containerid`)
 }
 
 func TestStartWithNoImageInstalledAndFailedToPull(t *testing.T) {
 	provider := &mocks.ImageProvider{}
 	provider.On(`Has`).Return(false, nil)
 	provider.On(`Pull`).Return(errors.New(`Whoops!`))
-	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Status`).Return(false, false, `containerid`, nil)
 	provider.On(`Create`).Return(`container-id`, nil)
 	provider.On(`Start`).Return(nil)
 
@@ -81,7 +81,7 @@ func TestStartWithNoImageInstalledAndFailedToCreate(t *testing.T) {
 	provider := &mocks.ImageProvider{}
 	provider.On(`Has`).Return(false, nil)
 	provider.On(`Pull`).Return(nil)
-	provider.On(`Status`).Return(false, false, nil)
+	provider.On(`Status`).Return(false, false, `containerid`, nil)
 	provider.On(`Create`).Return(``, errors.New(`Whoops!`))
 	provider.On(`Start`).Return(nil)
 
