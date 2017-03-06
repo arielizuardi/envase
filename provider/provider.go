@@ -11,7 +11,7 @@ type ImageProvider interface {
 	// Create create image and returns identifier for image
 	Create() (string, error)
 	// Start start image
-	Start() error
+	Start(containerID string) error
 	// Stop the image from running
-	Stop() error
+	Stop(containerID string) error
 }

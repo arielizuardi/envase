@@ -112,13 +112,13 @@ func (i *dockerImageProvider) Create() (string, error) {
 	return containerCreated.ID, nil
 }
 
-func (i *dockerImageProvider) Start() error {
-	return i.DockerClient.ContainerStart(i.Ctx, i.ContainerID, types.ContainerStartOptions{})
+func (i *dockerImageProvider) Start(containerID string) error {
+	return i.DockerClient.ContainerStart(i.Ctx, containerID, types.ContainerStartOptions{})
 }
 
-func (i *dockerImageProvider) Stop() error {
+func (i *dockerImageProvider) Stop(containerID string) error {
 	dur := time.Duration(30) * time.Second
-	if err := i.DockerClient.ContainerStop(i.Ctx, i.ContainerID, &dur); err != nil {
+	if err := i.DockerClient.ContainerStop(i.Ctx, containerID, &dur); err != nil {
 		return err
 	}
 
