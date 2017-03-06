@@ -45,7 +45,7 @@ func (dc *container) Start() error {
 	}
 
 	if !imageRunning {
-		if err := dc.Image.Start(); err != nil {
+		if err := dc.Image.Start(dc.ContainerID); err != nil {
 			return err
 		}
 	}
@@ -54,7 +54,7 @@ func (dc *container) Start() error {
 }
 
 func (dc *container) Stop() error {
-	return dc.Image.Stop()
+	return dc.Image.Stop(dc.ContainerID)
 }
 
 // NewDefaultContainer returns new instance of default container

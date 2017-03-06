@@ -63,13 +63,13 @@ func (_m *ImageProvider) Pull() error {
 	return r0
 }
 
-// Start provides a mock function with given fields:
-func (_m *ImageProvider) Start() error {
-	ret := _m.Called()
+// Start provides a mock function with given fields: containerID
+func (_m *ImageProvider) Start(containerID string) error {
+	ret := _m.Called(containerID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(containerID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -105,13 +105,13 @@ func (_m *ImageProvider) Status() (bool, bool, error) {
 	return r0, r1, r2
 }
 
-// Stop provides a mock function with given fields:
-func (_m *ImageProvider) Stop() error {
-	ret := _m.Called()
+// Stop provides a mock function with given fields: containerID
+func (_m *ImageProvider) Stop(containerID string) error {
+	ret := _m.Called(containerID)
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func() error); ok {
-		r0 = rf()
+	if rf, ok := ret.Get(0).(func(string) error); ok {
+		r0 = rf(containerID)
 	} else {
 		r0 = ret.Error(0)
 	}
