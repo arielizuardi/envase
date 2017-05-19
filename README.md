@@ -78,7 +78,7 @@ if err != nil {
 }
 ```
 
-# Note on using Glide, because github.com/docker/docker change to moby/moby
+## Note on using Glide, because github.com/docker/docker change to moby/moby
 Add this to your glide.yml file
 
 ```
