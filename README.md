@@ -77,3 +77,13 @@ if err != nil {
     panic(err)
 }
 ```
+
+# Note on using Glide, because github.com/docker/docker change to moby/moby
+Add this to your glide.yml file
+
+```
+- package: github.com/docker/docker
+  version: v17.05.0-ce-rc3
+  subpackages:
+  - client
+```
