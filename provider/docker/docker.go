@@ -8,10 +8,7 @@ import (
 	"time"
 
 	"github.com/arielizuardi/envase/provider"
-	"github.com/docker/docker/api/types"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/client"
-	"github.com/docker/go-connections/nat"
+	godocker "github.com/fsouza/go-dockerclient"
 )
 
 const (
@@ -21,7 +18,7 @@ const (
 
 type dockerImageProvider struct {
 	Ctx           context.Context
-	DockerClient  *client.Client
+	DockerClient  *godocker.Client
 	ImageName     string
 	Host          string
 	ContainerPort string
@@ -32,7 +29,7 @@ type dockerImageProvider struct {
 }
 
 func (i *dockerImageProvider) Has() (bool, error) {
-	images, err := i.DockerClient.ImageList(i.Ctx, types.ImageListOptions{})
+	images, err := i.DockerClient.ListImages(g.ListImagesOptions{})
 	if err != nil {
 		return false, err
 	}
@@ -52,7 +49,8 @@ func (i *dockerImageProvider) Has() (bool, error) {
 func (i *dockerImageProvider) Pull() error {
 	fmt.Printf(`>>> Pulling image [%v] ...`+"\n", i.ImageName)
 	imageURL := DefaultDockerLibraryURL + i.ImageName
-	out, err := i.DockerClient.ImagePull(i.Ctx, imageURL, types.ImagePullOptions{})
+	out, err := i.DockerClient.PullImage(godocker.ListImagesOptions{}, godocker.AuthConfiguration{})
+
 	if err != nil {
 		return err
 	}
@@ -67,7 +65,7 @@ func (i *dockerImageProvider) Status() (bool, bool, string, error) {
 	imageCreated := false
 	imageRunning := false
 
-	containers, err := i.DockerClient.ContainerList(i.Ctx, types.ContainerListOptions{All: true})
+	containers, err := i.DockerClient.ListContainers(godocker.ListContainersOptions{All: true})
 	if err != nil {
 		return imageCreated, imageRunning, i.ContainerID, err
 	}
@@ -93,19 +91,18 @@ func (i *dockerImageProvider) Create() (string, error) {
 		return ``, err
 	}
 
-	containerCreated, err := i.DockerClient.ContainerCreate(
-		i.Ctx,
-		&container.Config{
-			Image:        i.ImageName,
+	containerCreated, err := i.DockerClient.CreateContainer(godocker.CreateContainerOptions{
+		Name: i.ContainerName,
+		Config: godocker.Config{
+			Image: i.ImageName,
 			ExposedPorts: exposedPorts,
-			Env:          i.EnvConfig,
+			Env: i.EnvConfig,
 		},
-		&container.HostConfig{
-			PortBindings: portBindings,
+		HostConfig: godocker.HostConfig{
+			PortBindings: portBindings
 		},
-		nil,
-		i.ContainerName,
-	)
+		Context: i.Ctx,
+	})
 
 	if err != nil {
 		return ``, err
@@ -115,12 +112,12 @@ func (i *dockerImageProvider) Create() (string, error) {
 }
 
 func (i *dockerImageProvider) Start(containerID string) error {
-	return i.DockerClient.ContainerStart(i.Ctx, containerID, types.ContainerStartOptions{})
+	return i.DockerClient.StartContainer(containerID, godocker.HostConfig{})
 }
 
 func (i *dockerImageProvider) Stop(containerID string) error {
 	dur := time.Duration(30) * time.Second
-	if err := i.DockerClient.ContainerStop(i.Ctx, containerID, &dur); err != nil {
+	if err := i.DockerClient.StopContainer(containerID, dur); err != nil {
 		return err
 	}
 
@@ -128,7 +125,7 @@ func (i *dockerImageProvider) Stop(containerID string) error {
 }
 
 // NewDockerImageProvider returns new instance of docker image provider
-func NewDockerImageProvider(ctx context.Context, dockerClient *client.Client, imageName string, host string, containerPort string, exposedPort string, containerName string, envConfig []string) provider.ImageProvider {
+func NewDockerImageProvider(ctx context.Context, dockerClient *godocker.Client, imageName string, host string, containerPort string, exposedPort string, containerName string, envConfig []string) provider.ImageProvider {
 	return &dockerImageProvider{
 		Ctx:           ctx,
 		DockerClient:  dockerClient,
